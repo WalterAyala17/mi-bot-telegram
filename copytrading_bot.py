@@ -1,5 +1,8 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, CallbackContext
+import os
+import threading
+from flask import Flask
 
 # 🔑 Configuración del bot
 TOKEN = "7896585911:AAELNq-rpwNGeOK1aFMwEk6U63_X4Jf_aW8"
@@ -171,6 +174,19 @@ def main():
 
     print("✅ Bot de CopyTrading en marcha...")
     app.run_polling()
+    
+   # Ejecuta el bot en un hilo separado para que Flask también funcione
+    threading.Thread(target=app.run_polling).start()
+
+    # Ejecuta Flask
+    app_flask = Flask(__name__)
+
+    @app_flask.route('/')
+    def home():
+        return "Bot funcionando correctamente."
+
+    # Usar el puerto dinámico proporcionado por Render
+    app_flask.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
 
 if __name__ == "__main__":
     main()
